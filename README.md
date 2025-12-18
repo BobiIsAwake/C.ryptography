@@ -14,3 +14,7 @@ from the "defaults.enc" file.
 
 I am thinking of making the program use custom extension ".enc" or ".key" for the key files.
 This file will also be used for documentation and note taking as I work on the project.
+
+In the future - I might make a spinoff version or a V2 version
+Where I'll use proper techniques and use my expanded expirience
+from this project and what I learned in the meantime.
