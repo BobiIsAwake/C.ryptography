@@ -11,7 +11,7 @@
 FILE *fake;
 FILE *fusr;
 unsigned char DEFAULT_KEY[KEY_LEN] = {
-    'D','E','F','A','U','L','T','_','K','E','Y','_','1','2','3','4' //This is what a default key will look like until i think of somethig better...
+    'D','E','F','A','U','L','T','_','K','E','Y','_','1','2','3','4' //This is what a default key will look like until i think of something better...
 };
 
 //This struct has a password and username of a user
@@ -19,6 +19,14 @@ typedef struct User{
     char username[MAX+1];
     char password[MAX+1];
 }user;
+
+void Clear(){
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
 
 //Login screen for the user and login code.
 void Login(user login);
@@ -38,31 +46,50 @@ void UsrEnc();
 
 //List of options that a user can choose from.
 int Options();
+int FileChoice();
 
 int main(void){
     user login;
 
-    //Login screen for the user.
-    Login(login);
+    Login(login); //Login screen for the user.
 
-    //Options from which the user can choose from.
-    switch (Options())
-    {
+    Clear();
+    switch (Options()) {    //Options from which the user can choose from.
     case 1: //Encrypt with the default key
+        Clear();
+        switch(FileChoice()){ //User chooses what they want to encrypt and how.
+            case 1: //Encrypt text
+                Clear();
+                break;
+            case 2: //Encrypt file
+                Clear();
+                break;
+            default: //ERROR
+                Clear();
+                fprintf(stderr,"Unknown error!");
+                EOP(fake, fusr);
+                exit(1);
+        }
         break;
     case 2: //Encrypt with user key
+        Clear();
         break;
     case 3: //Decrypt
+        Clear();
         break;
     case 4: //Exit program
+        Clear();
         printf("Goodbye!");
         EOP(fake, fusr);
         exit(0);
-    default:
-        printf("Unknown error!");
+    default: //ERROR
+        Clear();
+        fprintf(stderr, "Unknown error!");
+        EOP(fake, fusr);
         exit(1);
     }
 
+    EOP(fake,fusr); //End of program
     return 0;
 }
 void Login(user login){
@@ -74,7 +101,7 @@ void Login(user login){
 void Check(user login){
     //This part of the program checks if the file users.txt exists and if it does not it will generate it.
     if((fake = fopen("users.txt", "r+")) == NULL){
-        printf("Generating users.txt...\n");
+        printf("users.txt does not exist.\nGenerating users.txt...\n");
         if((fusr = fopen("users.txt", "w+")) == NULL){
             fprintf(stderr, "Fatal error!\nTerminating the program.");
             EOP(fake, fusr);
@@ -94,9 +121,24 @@ int Options(){
         scanf("%d", &n);
         getchar();
         if(n<1 || n>4){
-            printf("Incorrect option try again!\n");
+            printf("Incorrect option, try again!\n");
             printf("Please type the number of the option: ");
         }
     }while(n<1 || n>4);
+    return n;
+}
+
+int FileChoice(){
+    int n;
+    printf("1.\tEncrypt text\n2.\tEncrypt file");
+    printf("\nPlease type the number of the option: ");
+    do{
+        scanf("%d", &n);
+        getchar();
+        if(n<1 || n>2){
+            printf("Incorrect opetion, try again!\n");
+            printf("Please type the number of the option: ");
+        }
+    }while(n<1 || n>2);
     return n;
 }
