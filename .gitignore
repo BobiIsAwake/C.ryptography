@@ -3,6 +3,9 @@
 .Program/*.bin
 .Program/*.key
 
+# Test
+.Test/
+
 # VS Code
 .vscode/
 *.code-workspac
