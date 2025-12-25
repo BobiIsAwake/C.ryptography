@@ -1,10 +1,10 @@
 #Program
-.Program/*.txt
-.Program/*.bin
-.Program/*.key
+Program/*.txt
+Program/*.bin
+Program/*.key
 
 # Test
-.Test/
+Test/
 
 # VS Code
 .vscode/

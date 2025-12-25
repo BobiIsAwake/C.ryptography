@@ -3,13 +3,16 @@
 #include <string.h>
 #include <ctype.h>
 
+#define MAX 30 //Max length of a users username andpassword separetly
+#define KEY_LEN 16 //This key is 16 bytes long and will be hard coded into this program!!!
+//This is extremely unsafe and I extremely advise against hardcoding default keys or any sensitive info into your program!!!
+
 //Global variables/files that are actively used.
 FILE *fake;
 FILE *fusr;
-
-#define MAX 30 //Max length of a users username andpassword separetly
-#define KEY "HelloWorld123456" //This key is 16 bytes long and will be hard coded into this program!!!
-//This is extremely unsafe and I extremely advise against hardcoding default keys or any sensitive info into your program!!!
+unsigned char DEFAULT_KEY[KEY_LEN] = {
+    'D','E','F','A','U','L','T','_','K','E','Y','_','1','2','3','4'
+};
 
 //This struct has a password and username of a user
 typedef struct User{
