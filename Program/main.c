@@ -3,6 +3,10 @@
 #include <string.h>
 #include <ctype.h>
 
+//Global variables/files that are actively used.
+FILE *fake;
+FILE *fusr;
+
 #define MAX 30 //Max length of a users username andpassword separetly
 #define KEY "HelloWorld123456" //This key is 16 bytes long and will be hard coded into this program!!!
 //This is extremely unsafe and I extremely advise against hardcoding default keys or any sensitive info into your program!!!
@@ -14,48 +18,65 @@ typedef struct User{
 }user;
 
 //Login screen for the user and login code.
-void Login(char Username[MAX+1]);
+void Login(user login);
 //Checks users password.
-void Check(char Username[MAX+1]);
+void Check(user login);
+
+//End of program.
+void EOP(FILE* fake, FILE* fusr){
+    fclose(fake);
+    fclose(fusr);
+}
 
 //List of options that a user can choose from.
 int Options();
 
 int main(void){
-    FILE *fkey;
+    user login;
 
+    //Login screen for the user.
+    Login(login);
 
     //Options from which the user can choose from.
     switch (Options())
     {
-    case 1:
-        /* code */
+    case 1: //Encrypt with the default key
         break;
-    case 2:
-        //
+    case 2: //Encrypt with user key
         break;
-    case 3:
-        //
+    case 3: //Decrypt
         break;
-    case 4:
+    case 4: //Exit program
         printf("Goodbye!");
+        EOP(fake, fusr);
         exit(0);
     default:
         printf("Unknown error!");
         exit(1);
     }
 
-    fclose(fkey);
     return 0;
 }
-void Login(char Username[MAX+1]){
-    pritnf("Please inout your username: ");
-    Check(Username);
+void Login(user login){
+    printf("Please enter your username: ");
+    fgets(login.username, MAX+1, stdin);
+    Check(login);
 }
+
+void Check(user login){
+    //This part of the program checks if the file users.txt exists and if it does not it will generate it.
+    if((fake = fopen("users.txt", "r+")) == NULL){
+        printf("Generating users.txt...\n");
+        if((fusr = fopen("users.txt", "w+")) == NULL){
+            fprintf(stderr, "Fatal error!\nTerminating the program.");
+            EOP(fake, fusr);
+        }
+    }
+}
+
 int Options(){
     int n;
-    printf("Welcome!\n",
-    "Please choose an option.");
+    printf("Welcome!\nPlease choose an option.\n");
     printf("1.\tEncrypt using a default key. (work in progress)\n");
     printf("2.\tEncrypt using a user generated key. (does not work)\n");
     printf("3.\tDecrypt (does not work)\n");

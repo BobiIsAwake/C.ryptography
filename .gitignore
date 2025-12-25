@@ -1,3 +1,8 @@
+#Program
+.Program/*.txt
+.Program/*.bin
+.Program/*.key
+
 # VS Code
 .vscode/
 *.code-workspac
