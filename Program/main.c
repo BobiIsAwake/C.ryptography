@@ -11,7 +11,7 @@
 FILE *fake;
 FILE *fusr;
 unsigned char DEFAULT_KEY[KEY_LEN] = {
-    'D','E','F','A','U','L','T','_','K','E','Y','_','1','2','3','4'
+    'D','E','F','A','U','L','T','_','K','E','Y','_','1','2','3','4' //This is what a default key will look like until i think of somethig better...
 };
 
 //This struct has a password and username of a user
@@ -30,6 +30,11 @@ void EOP(FILE* fake, FILE* fusr){
     fclose(fake);
     fclose(fusr);
 }
+
+//Encryption function
+void DefEnc();
+//Where the key is the user generated key pulled out from the .key
+void UsrEnc();
 
 //List of options that a user can choose from.
 int Options();
