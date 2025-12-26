@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <openssl/md5.h>
 
 #define MAX 30 //Max length of a users username andpassword separetly
 #define KEY_LEN 16 //This key is 16 bytes long and will be hard coded into this program!!!
@@ -10,17 +11,15 @@
 //Global variables/files that are actively used.
 FILE *fake;
 FILE *fusr;
-unsigned char DEFAULT_KEY[KEY_LEN] = {
-    'D','E','F','A','U','L','T','_','K','E','Y','_','1','2','3','4' //This is what a default key will look like until i think of something better...
-};
+unsigned char DEFAULT_KEY[KEY_LEN]; //This is where the key will be stored and it will steal the users password.
 
 //This struct has a password and username of a user
 typedef struct User{
     char username[MAX+1];
     char password[MAX+1];
-}user;
+}User;
 
-void Clear(){
+void Clear(){ //Clears the console
     #ifdef _WIN32
         system("cls");
     #else
@@ -28,10 +27,14 @@ void Clear(){
     #endif
 }
 
+/////////////////////////////////////////////////FUNCTIONS/////////////////////////////////////////////////
+
 //Login screen for the user and login code.
-void Login(user login);
+void Login(User login);
+void Create(User login, char buf[(MAX*2)+1], char pom[(MAX*2)+1]); //User registration
 //Checks users password.
-void Check(user login);
+void Check(User login);
+
 
 //End of program.
 void EOP(FILE* fake, FILE* fusr){
@@ -48,8 +51,10 @@ void UsrEnc();
 int Options();
 int FileChoice();
 
+/////////////////////////////////////////////////MAIN/////////////////////////////////////////////////
+
 int main(void){
-    user login;
+    User login;
 
     Login(login); //Login screen for the user.
 
@@ -92,20 +97,91 @@ int main(void){
     EOP(fake,fusr); //End of program
     return 0;
 }
-void Login(user login){
+
+/////////////////////////////////////////////////FUNCTIONS/////////////////////////////////////////////////  
+
+void Login(User login){
     printf("Please enter your username: ");
     fgets(login.username, MAX+1, stdin);
     Check(login);
 }
 
-void Check(user login){
+//Login info will be stored as: 
+//username,password\n
+//username,password\n
+//...
+
+void Check(User login){
+    char buf[(2*MAX)+1], pom[(2*MAX)+1];
+    memset(buf,0,sizeof(buf));
+    memset(pom,0,sizeof(pom));
+
     //This part of the program checks if the file users.txt exists and if it does not it will generate it.
-    if((fake = fopen("users.txt", "r+")) == NULL){
+    if((fusr = fopen("users.txt", "r+")) == NULL){
+        fclose(fusr);
         printf("users.txt does not exist.\nGenerating users.txt...\n");
         if((fusr = fopen("users.txt", "w+")) == NULL){
             fprintf(stderr, "Fatal error!\nTerminating the program.");
             EOP(fake, fusr);
+            exit(1);
         }
+    }
+
+    printf("Please enter your password: ");
+
+    fgets(login.password, MAX+1, stdin);
+
+    //This part of the code checks if '\n' exists
+    if(strchr(login.username, '\n') != NULL){
+        *strchr(login.username, '\n') = 0;
+    }
+    if(strchr(login.password, '\n') != NULL){
+        *strchr(login.password, '\n') = 0;
+    }
+
+    rewind(fusr);
+
+    //I HAVE ACCIDENTALLY RECREATED STRCAT() !!!!
+    // strncpy(buf, login.username, strlen(login.username)); //buf = "username-------------"
+    // buf[strlen(login.username)] = ','; // buf = "username,------------"
+    // strncpy(buf[strlen(login.username)+2], login.password, strlen(login.password)); //buf = "username,password"
+    
+    //This will just make it easier me to compare user info with stored info
+    strcat(buf,login.username);
+    strcat(buf, ",");
+    strcat(buf, login.password);
+
+    while(fgets(pom, (2*MAX)+1, fusr) != NULL){
+        if(strchr(pom, '\n') != NULL){
+            *strchr(pom, '\n') = 0;
+        }
+        if(!strcmp(buf,pom)){
+            break;
+        }
+        else if(strcmp(buf,pom)){
+            Create(login, buf, pom);
+            break;
+        }
+    }
+}
+
+void Create (User login, char buf[(MAX*2)+1], char pom[(MAX*2)+1]){
+    Clear();
+    printf("\nDo you want to create a new account?(y/n) ");
+    char yn = getchar();
+    if(yn == 'y'){
+        //code
+    }
+    else if(yn == 'n'){
+        getchar();
+        Login(login);
+    }
+    else{
+        do{
+            printf("Please enter a valid choise (y/n): ");
+            yn = getchar();
+            getchar();
+        }while(yn != 'y' || yn != 'n');
     }
 }
 
