@@ -151,18 +151,18 @@ void Check(User login){
     strcat(buf, ",");
     strcat(buf, login.password);
 
+    int chk = 1;
     while(fgets(pom, (2*MAX)+1, fusr) != NULL){
         if(strchr(pom, '\n') != NULL){
             *strchr(pom, '\n') = 0;
         }
         if(!strcmp(buf,pom)){
-            break;
-        }
-        else if(strcmp(buf,pom)){
-            Create(login, buf, pom);
+            chk = 0;
             break;
         }
     }
+    if(chk == 1)
+        Create(login, buf, pom);
 }
 
 void Create (User login, char buf[(MAX*2)+1], char pom[(MAX*2)+1]){
