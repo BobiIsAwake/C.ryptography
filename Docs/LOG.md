@@ -1,3 +1,14 @@
+Login screen ✅
+Save user data in a file ✅
+Generate a "unique" default user key ✅
+Encryption with default key ❕
+Decryption with default key
+Let user generate their own key
+Encryption with users key
+Decryption with users key
+
+----------------------------------------------------------------------------
+
 Update 25.12.2025.
     #Users will have an option to log in to use their saved keys that they have generated.#
 
@@ -20,7 +31,12 @@ Update 26.12.2025.
 
 They default key will be diffrent for each user.
 The key will take first 4 characters of the username and 4 characers of their password
-and get first 8 bytes of the key, other 8 bytes will be appended.
+and get first 8 bytes of the key, other 8 bytes will be padded.
 This way - each user has their own SOMEWHAT unique key and the program is a bit safer.
 
 ADDED 100+ LINES OF CODE AND ONLY ONE ERROR!!!!!!!!!!!!!!
+
+Fixed sending of literal copy of struct witch lead to data loss
+"Dynamic" generating key has been made.
+I am done for today I will go and cry myself to sleep .
+Its up for the future me to figure out encryption :3
