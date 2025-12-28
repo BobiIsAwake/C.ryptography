@@ -301,7 +301,7 @@ void DEncText(){
     //Encryption part!
     //int j = 0;
     unsigned char *TextEnc;
-    if((TextEnc = malloc(strlen(Text)+1)) == NULL){
+    if((TextEnc = calloc(strlen(Text)+1,sizeof(char)) == NULL)){
         fprintf(stderr, "Could not allocate memory for TextEnc string! Terminating program.");
         free(Text);
         fclose(EncText);
