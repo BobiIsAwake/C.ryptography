@@ -49,3 +49,23 @@ Now I need to figure out how to do encryption - I've done multiple seminars
 on cryptography and even explaning how it's done - yet I have no idea how to do it practically.
 Maybe other parts of the program will be enhanced over time as I am trying to figure out how to do encryption
 and decryption.
+
+I have decided on Vigenère style cipher
+
+----------------------------------------------------------------------------
+
+Update 28.12.2025.
+
+After some tinkering I was able to get the encryption working (it was fast)
+I found out that i can use modulo instead of creating a new variable
+so instead of my previous logic
+Enc[i] = (text[i] + KEY[j]) % 256;
+if(KEY[j] != '\0'){
+    code
+}
+else if(KEY[j] == '\0'){
+    code
+}
+
+i can do it in one line !!!
+Enc[i]= (text[i] + KEY[i % strlen(KEY)]) % 256;
