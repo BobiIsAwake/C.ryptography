@@ -40,3 +40,12 @@ Fixed sending of literal copy of struct witch lead to data loss
 "Dynamic" generating key has been made.
 I am done for today I will go and cry myself to sleep .
 Its up for the future me to figure out encryption :3
+
+----------------------------------------------------------------------------
+
+Update 27.12.2025.
+
+Now I need to figure out how to do encryption - I've done multiple seminars
+on cryptography and even explaning how it's done - yet I have no idea how to do it practically.
+Maybe other parts of the program will be enhanced over time as I am trying to figure out how to do encryption
+and decryption.
