@@ -1,8 +1,8 @@
 Login screen ✅
 Save user data in a file ✅
 Generate a "unique" default user key ✅
-Encryption with default key ❕
-Decryption with default key
+Encryption with default key ❕/✅
+Decryption with default key ✅
 Let user generate their own key
 Encryption with users key
 Decryption with users key
@@ -69,3 +69,7 @@ else if(KEY[j] == '\0'){
 
 i can do it in one line !!!
 Enc[i]= (text[i] + KEY[i % strlen(KEY)]) % 256;
+
+I'll be working on extracting data fromn a file and encrypting it.
+I believe it won't be any diffrent from how I was pullng out 
+information on how long decrypted data is.
