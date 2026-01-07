@@ -1,9 +1,9 @@
 Login screen ✅
 Save user data in a file ✅
 Generate a "unique" default user key ✅
-Encryption with default key ❕/✅
+Encryption with default key ✅
 Decryption with default key ✅
-Let user generate their own key
+Let user generate their own key ❕
 Encryption with users key
 Decryption with users key
 
@@ -73,3 +73,14 @@ Enc[i]= (text[i] + KEY[i % strlen(KEY)]) % 256;
 I'll be working on extracting data fromn a file and encrypting it.
 I believe it won't be any diffrent from how I was pullng out 
 information on how long decrypted data is.
+
+----------------------------------------------------------------------------
+
+Update 05.01.2026.
+
+Well happy new year everyone!
+Took a bit of a break since i got really sick and a bunch of holidays are now lining up for me :(
+But - hopefully, if I grind this hard enought today, I will be able to finish the program :D
+(Not me trying to figure out what I did and what I need to do - the checklist is NOT helping)
+Looking at what I have done - I just need to practically copy and paste functions and slightly edit them!
+Besides the user key function I HAVE ZERO IDEA HOW TO DO IT.
