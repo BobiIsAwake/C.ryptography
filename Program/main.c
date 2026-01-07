@@ -84,6 +84,7 @@ int main(void){
                     break;
                 case 2: //Encrypt file
                     Clear();
+                    DEncFile();
                     break;
                 default: //ERROR
                     Clear();
@@ -309,7 +310,7 @@ void DEncText(){
         exit(1);
     }
     for(int i = 0; i<strlen(Text); i++){
-        TextEnc[i] = (Text[i] + DEFAULT_KEY[i % strlen(DEFAULT_KEY)]) % 256;
+        TextEnc[i] = (Text[i] + DEFAULT_KEY[i % KEY_LEN]) % 256;
         // if(DEFAULT_KEY[j] != '\0'){
         //     j++;
         // }
@@ -323,6 +324,70 @@ void DEncText(){
     fflush(EncText);
     free(Text);
     free(TextEnc);
+}
+
+void DEncFile(){  //Encrypts an existing .txt file!
+    FILE *fraw, *fEnc;  //fraw is raw text, and fEnc is encrypted .txt file
+    char *loc;  //Location of the file
+    if(!(loc = malloc(151*sizeof(char)))){ //allocation of memory for file location
+        fprintf(stderr, "Error allocating memory for loc! Terminating program.");
+        EOP(fkey, fusr);
+        exit(1);
+    }
+    printf("Please enter the location of the .txt file you want to encrypt (e.g. ../folder/file.txt): ");
+    fgets(loc, 150, stdin);
+    if(strchr(loc, '\n') != 0){ //Erases enter from the location
+        *strchr(loc, '\n') = 0;
+    }
+
+    fraw = fopen(loc, "rb"); 
+    do{
+        if(fraw != NULL){
+            break;
+        }
+        fclose(fraw);
+        fprintf(stderr, "Could not open destination %s.\nEnter new destination: ", loc);
+        fgets(loc, 150, stdin);
+        if(strchr(loc, '\n') != 0){ //Erases enter from the location
+            *strchr(loc, '\n') = 0;
+        }
+        fraw = fopen(loc, "rb");
+    }while(fraw == NULL);
+
+    fseek(fraw, 0 , SEEK_END); //Goes to the end of the file
+    long len = ftell(fraw); //Say how many characters it has
+    rewind(fraw); //Goes back to the start of the file.
+
+    unsigned char *EncBuf, *RawBuf;     //Memory allocation for Raw contents and Encrypted encrypted.
+    EncBuf = malloc(len * sizeof(char));
+    RawBuf = malloc(len * sizeof(char));
+    if(!EncBuf || !RawBuf){
+        fprintf(stderr, "Memory allocation for encrypted and decrypted text failed!");
+        free(loc);
+        free(EncBuf);
+        free(RawBuf);
+        fclose(fraw);
+        EOP(fkey,fusr);
+        exit(1);
+    }
+
+    //File encryption
+
+    fread(RawBuf, 1, len, fraw); //Reads the contents of the file :3
+
+    for(long i = 0; i<len; i++){
+        EncBuf[i] = (RawBuf[i] + DEFAULT_KEY[i % KEY_LEN]) % 256;
+    }
+
+    //Inputs the encrypted file
+    fEnc = fopen("EncFile.txt", "wb");
+    rewind(fEnc);
+    fwrite(EncBuf, 1, len, fEnc);
+    fflush(fEnc);
+
+    free(loc);
+    fclose(fraw);
+    fclose(fEnc);
 }
 
 int DChoice(){
@@ -341,14 +406,14 @@ int DChoice(){
 }
 
 void DDec(){
-    FILE *fDec, *fEnc;
+    FILE *fDec, *fEnc; //fDec is for decrypted and fEnc is for encrypted
     char *loc; //file location
     if(!(loc = malloc(151*sizeof(char)))){
         fprintf(stderr, "Error allocating memory for loc! Terminating program.");
         EOP(fkey,fusr);
         exit(1);
     }
-    printf("Please enter the location of the encrypted file (e.g. ../file.txt): ");
+    printf("Please enter the location of the encrypted file (e.g. ../folder/file.txt): ");
     fgets(loc, 150, stdin);
     if(strchr(loc, '\n') != 0){ //Erases enter from the location
         *strchr(loc, '\n') = 0;
@@ -377,6 +442,7 @@ void DDec(){
     DecBuf = malloc(len * sizeof(char));
     if(!EncBuf || !DecBuf){
         fprintf(stderr, "Memory allocation for encrypted and decrypted text failed!");
+        free(loc);
         free(EncBuf);
         free(DecBuf);
         fclose(fEnc);
