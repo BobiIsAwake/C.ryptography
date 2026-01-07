@@ -84,3 +84,11 @@ But - hopefully, if I grind this hard enought today, I will be able to finish th
 (Not me trying to figure out what I did and what I need to do - the checklist is NOT helping)
 Looking at what I have done - I just need to practically copy and paste functions and slightly edit them!
 Besides the user key function I HAVE ZERO IDEA HOW TO DO IT.
+
+----------------------------------------------------------------------------
+
+Update 07.01.2026.
+
+The program is done!
+I am aware that the functions could've been actually changed a lot and I have a random fkey floating in my program
+but in the following days I will be working on actual optimization and removing redundant code :3
