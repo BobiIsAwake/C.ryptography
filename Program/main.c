@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <direct.h>   // _getcwd
+#include <limits.h>   // _MAX_PATH
 
 #define MAX 30 //Max length of a users username andpassword separetly
 #define KEY_LEN 16 //This key is 16 bytes long and will be hard coded into this program!!!
@@ -195,7 +197,6 @@ void Check(User *login){  //Checks if the user exists and if the users.txt file 
 
     //This part of the program checks if the file users.txt exists and if it does not it will generate it.
     if((fusr = fopen("users.txt", "r+")) == NULL){
-        fclose(fusr);
         printf("users.txt does not exist.\nGenerating users.txt...\n");
         if((fusr = fopen("users.txt", "w+")) == NULL){
             fprintf(stderr, "Fatal error!\nTerminating the program.");
@@ -360,8 +361,25 @@ void DEncText(){  //Default key text encryption
     rewind(EncText);
     fputs(TextEnc, EncText);
     fflush(EncText);
+
+    char cwd[_MAX_PATH];
+    if (_getcwd(cwd, _MAX_PATH) == NULL) {
+        fprintf(stderr,"getcwd failed\nFile name is EncFile.txt and is located at the same location where the program is.");
+        printf("\nPress enter to return to main menu.");
+        getchar();
+
+        free(Text);
+        free(TextEnc);
+        fclose(EncText);
+        return;
+    }
+    printf("Enecrypted file is saved at:\n%s\\EncFile.txt\n", cwd);
+    printf("\nPress enter to return to main menu.");
+    getchar();
+
     free(Text);
     free(TextEnc);
+    fclose(EncText);
 }
 
 void UEncText(){  //User key text encryption
@@ -400,8 +418,25 @@ void UEncText(){  //User key text encryption
     rewind(EncText);
     fputs(TextEnc, EncText);
     fflush(EncText);
+
+    char cwd[_MAX_PATH];
+    if (_getcwd(cwd, _MAX_PATH) == NULL) {
+        fprintf(stderr,"getcwd failed\nFile name is EncFile.txt and is located at the same location where the program is.");
+        printf("\nPress enter to return to main menu.");
+        getchar();
+
+        free(Text);
+        free(TextEnc);
+        fclose(EncText);
+        return;
+    }
+    printf("Enecrypted file is saved at:\n%s\\EncFile.txt\n", cwd);
+    printf("\nPress enter to return to main menu.");
+    getchar();
+
     free(Text);
     free(TextEnc);
+    fclose(EncText);
 }
 
 void DEncFile(){  //Default key file encryption
@@ -463,10 +498,24 @@ void DEncFile(){  //Default key file encryption
     fwrite(EncBuf, 1, len, fEnc);
     fflush(fEnc);
 
+    char cwd[_MAX_PATH];
+    if (_getcwd(cwd, _MAX_PATH) == NULL) {
+        fprintf(stderr,"getcwd failed\nFile name is EncFile.txt and is located at the same location where the program is.");
+        printf("\nPress enter to return to main menu.");
+        getchar();
+
+        free(loc);
+        fclose(fraw);
+        fclose(fEnc);
+        return;
+    }
+    printf("Enecrypted file is saved at:\n%s\\EncFile.txt\n", cwd);
+    printf("\nPress enter to return to main menu.");
+    getchar();
+
     free(loc);
     fclose(fraw);
     fclose(fEnc);
-    EOP(fkey, fusr);
 }
 
 void UEncFile(){  //User key file encryption
@@ -528,10 +577,24 @@ void UEncFile(){  //User key file encryption
     fwrite(EncBuf, 1, len, fEnc);
     fflush(fEnc);
 
+    char cwd[_MAX_PATH];
+    if (_getcwd(cwd, _MAX_PATH) == NULL) {
+        fprintf(stderr,"getcwd failed\nFile name is EncFile.txt and is located at the same location where the program is.");
+        printf("\nPress enter to return to main menu.");
+        getchar();
+
+        free(loc);
+        fclose(fraw);
+        fclose(fEnc);
+        return;
+    }
+    printf("Enecrypted file is saved at:\n%s\\EncFile.txt\n", cwd);
+    printf("\nPress enter to return to main menu.");
+    getchar();
+
     free(loc);
     fclose(fraw);
     fclose(fEnc);
-    EOP(fkey, fusr);
 }
 
 int DChoice(){  //Option between default key decryption or user key decryption
@@ -614,6 +677,23 @@ void DDec(){  //Default key decryption
     fwrite(DecBuf, 1, len, fDec);
     // fputs(DecBuf, fDec);
 
+    char cwd[_MAX_PATH];
+    if (_getcwd(cwd, _MAX_PATH) == NULL) {
+        fprintf(stderr,"getcwd failed\nFile name is DecryptedText.txt and is located at the same location where the program is.");
+        printf("\nPress enter to return to main menu.");
+        getchar();
+
+        fclose(fEnc);
+        fclose(fDec);
+        free(loc);
+        free(EncBuf);
+        free(DecBuf);
+        return;
+    }
+    printf("Decrypted file is saved at:\n%s\\DecryptedText.txt\n", cwd);
+    printf("\nPress enter to return to main menu.");
+    getchar();
+
     fclose(fEnc);
     fclose(fDec);
     free(loc);
@@ -684,6 +764,23 @@ void UDec(){  //User key decryption
         exit(1);
     }
     fwrite(DecBuf, 1, len, fDec);
+
+    char cwd[_MAX_PATH];
+    if (_getcwd(cwd, _MAX_PATH) == NULL) {
+        fprintf(stderr,"getcwd failed\nFile name is DecryptedText.txt and is located at the same location where the program is.");
+        printf("\nPress enter to return to main menu.");
+        getchar();
+
+        fclose(fEnc);
+        fclose(fDec);
+        free(loc);
+        free(EncBuf);
+        free(DecBuf);
+        return;
+    }
+    printf("Decrypted file is saved at:\n%s\\DecryptedText.txt\n", cwd);
+    printf("\nPress enter to return to main menu.");
+    getchar();
 
     fclose(fEnc);
     fclose(fDec);
