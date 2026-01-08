@@ -459,10 +459,21 @@ void DEncFile(){  //Default key file encryption
             break;
         }
         fclose(fraw);
-        fprintf(stderr, "Could not open destination %s.\nEnter new destination: ", loc);
+        fprintf(stderr, "Could not open destination %s.\nEnter new destination; \nor write menu to return to the main menu or exit to exit the program: ", loc);
         fgets(loc, 150, stdin);
         if(strchr(loc, '\n') != 0){ //Erases enter from the location
             *strchr(loc, '\n') = 0;
+        }
+        if(strcmp(loc,"menu") == 0){
+            free(loc);
+            fclose(fraw);
+            return;
+        }
+        else if (strcmp(loc,"exit") == 0){
+            free(loc);
+            fclose(fraw);
+            EOP(fkey, fusr);
+            exit(0);
         }
         fraw = fopen(loc, "rb");
     }while(fraw == NULL);
@@ -538,10 +549,21 @@ void UEncFile(){  //User key file encryption
             break;
         }
         fclose(fraw);
-        fprintf(stderr, "Could not open destination %s.\nEnter new destination: ", loc);
+        fprintf(stderr, "Could not open destination %s.\nEnter new destination; \nor write menu to return to the main menu or exit to exit the program: ", loc);
         fgets(loc, 150, stdin);
         if(strchr(loc, '\n') != 0){ //Erases enter from the location
             *strchr(loc, '\n') = 0;
+        }
+        if(strcmp(loc,"menu") == 0){
+            free(loc);
+            fclose(fraw);
+            return;
+        }
+        else if (strcmp(loc,"exit") == 0){
+            free(loc);
+            fclose(fraw);
+            EOP(fkey, fusr);
+            exit(0);
         }
         fraw = fopen(loc, "rb");
     }while(fraw == NULL);
@@ -632,10 +654,21 @@ void DDec(){  //Default key decryption
             break;
         }
         fclose(fEnc);
-        fprintf(stderr, "Could not open destination %s.\nEnter new destination: ", loc);
+        fprintf(stderr, "Could not open destination %s.\nEnter new destination;\nor write menu to return to the main menu or exit to exit the program:  ", loc);
         fgets(loc, 150, stdin);
         if(strchr(loc, '\n') != 0){ //Erases enter from the location
             *strchr(loc, '\n') = 0;
+        }
+        if(strcmp(loc, "menu") == 0){
+            fclose(fEnc);
+            free(loc);
+            return;
+        }
+        else if(strcmp(loc, "exit") == 0){
+            fclose(fEnc);
+            free(loc);
+            EOP(fkey, fusr);
+            exit(0);
         }
         fEnc = fopen(loc, "rb");
     }while(fEnc == NULL);
@@ -721,10 +754,21 @@ void UDec(){  //User key decryption
             break;
         }
         fclose(fEnc);
-        fprintf(stderr, "Could not open destination %s.\nEnter new destination: ", loc);
+        fprintf(stderr, "Could not open destination %s.\nEnter new destination;\nor write menu to return to the main menu or exit to exit the program:  ", loc);
         fgets(loc, 150, stdin);
         if(strchr(loc, '\n') != 0){ //Erases enter from the location
             *strchr(loc, '\n') = 0;
+        }
+        if(strcmp(loc, "menu") == 0){
+            fclose(fEnc);
+            free(loc);
+            return;
+        }
+        else if(strcmp(loc, "exit") == 0){
+            fclose(fEnc);
+            free(loc);
+            EOP(fkey, fusr);
+            exit(0);
         }
         fEnc = fopen(loc, "rb");
     }while(fEnc == NULL);
