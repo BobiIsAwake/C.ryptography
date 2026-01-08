@@ -12,8 +12,6 @@
 
 FILE *fkey;
 FILE *fusr;
-unsigned char DEFAULT_KEY[KEY_LEN+1]; //This is where the default key will be stored. The key looks like User + Pass + Padding
-unsigned char USER_KEY[KEY_LEN+1];
 unsigned char PADDING_KEY[16+1] = {'l','o','r','e','m','i','p','s','u','m','r','i','g','b','y','a','\0'};
 
 //User data
@@ -37,22 +35,22 @@ void Create(User *login, unsigned char buf[(MAX*2)+1], unsigned char pom[(MAX*2)
 
 void Check(User *login); //Checks users password.
 
-void DefKey(User *login); //Default key generation
-void UsrKey(); //User key generation
+void DefKey(User *login, unsigned char DEFAULT_KEY[KEY_LEN+1]); //Default key generation
+void UsrKey(unsigned char USER_KEY[KEY_LEN+1]); //User key generation
 
 //Main case options:
 //Case 1 "Encrypt with default key"
-    void DEncText(); //Case 1 - Text option
-    void DEncFile(); //Case 1 - File option
+    void DEncText(unsigned char DEFAULT_KEY[KEY_LEN+1]); //Case 1 - Text option
+    void DEncFile(unsigned char DEFAULT_KEY[KEY_LEN+1]); //Case 1 - File option
 
 //Case 2 "Encrypt with user key"
-    void UEncText(); //Case 2 - Text option
-    void UEncFile(); //Case 2 - File option
+    void UEncText(unsigned char USER_KEY[KEY_LEN+1]); //Case 2 - Text option
+    void UEncFile(unsigned char USER_KEY[KEY_LEN+1]); //Case 2 - File option
 
 //Case 3 "Decrypt"
 int DChoice();
-    void DDec();//Case 3 - Default key
-    void UDec(); //Case 3 - User key
+    void DDec(unsigned char DEFAULT_KEY[KEY_LEN+1]);//Case 3 - Default key
+    void UDec(unsigned char USER_KEY[KEY_LEN+1]); //Case 3 - User key
 
 //List of options that a user can choose from.
 int Options(User *login);
@@ -60,19 +58,23 @@ int FileChoice();
 
 //End of program.
 void EOP(FILE* fake, FILE* fusr){
-    fclose(fake);
-    fclose(fusr);
+    if(fake != NULL)
+        fclose(fake);
+    if(fusr != NULL)
+        fclose(fusr);
 }
 
 /////////////////////////////////////////////////MAIN/////////////////////////////////////////////////
 
 int main(void){
     User login;
+    unsigned char DEFAULT_KEY[KEY_LEN+1]; //This is where the default key will be stored. The key looks like User + Pass + Padding
+    unsigned char USER_KEY[KEY_LEN+1];
 
     Login(&login); //Login screen for the user.
     Clear();
 
-    DefKey(&login);
+    DefKey(&login, DEFAULT_KEY);
     Clear();
 
     while(1){
@@ -83,11 +85,13 @@ int main(void){
             switch(FileChoice()){ //User chooses what they want to encrypt and how.
                 case 1: //Encrypt text
                     Clear();
-                    DEncText();
+                    DEncText(DEFAULT_KEY);
                     break;
                 case 2: //Encrypt file
                     Clear();
-                    DEncFile();
+                    DEncFile(DEFAULT_KEY);
+                    break;
+                case 3:
                     break;
                 default: //ERROR
                     Clear();
@@ -99,15 +103,17 @@ int main(void){
 
         case 2: //Encrypt with user key
             Clear();
-            UsrKey();
+            UsrKey(USER_KEY);
             switch (FileChoice()){ //Text or file
                 case 1: //Text
                     Clear();
-                    UEncText();
+                    UEncText(USER_KEY);
                     break;
                 case 2: //File
                     Clear();
-                    UEncFile();
+                    UEncFile(USER_KEY);
+                    break;
+                case 3:
                     break;
                 default: //ERROR
                     Clear();
@@ -121,12 +127,12 @@ int main(void){
             switch (DChoice()){
                 case 1: //Default key decryption
                     Clear();
-                    DDec();
+                    DDec(DEFAULT_KEY);
                     break;
                 case 2: //User key decryption
                     Clear();
-                    UsrKey();
-                    UDec();
+                    UsrKey(USER_KEY);
+                    UDec(USER_KEY);
                     break;
                 default: //ERROR
                     Clear();
@@ -181,14 +187,18 @@ void Check(User *login){  //Checks if the user exists and if the users.txt file 
 
     //Memory allocation
     if(!(buf = malloc((2*MAX+2)*sizeof(char)))){
-        fprintf(stderr, "Fatal error! Could not allocate memory! Line 181.");
-        EOP(fkey,fusr);
+        fprintf(stderr, "Fatal error! Could not allocate memory! Line 184.\nPress enter to continue.");
+        getchar();
+        if(fkey != NULL || fusr != NULL)
+            EOP(fkey,fusr);
         exit(1);
     }
     if(!(pom = malloc((2*MAX+2)*sizeof(char)))){
-        fprintf(stderr, "Fatal error! Could not allocate memory! Line 186.");
+        fprintf(stderr, "Fatal error! Could not allocate memory! Line 190.\nPress enter to continue.");
+        getchar();
         free(buf);
-        EOP(fkey,fusr);
+        if(fkey != NULL || fusr != NULL)
+            EOP(fkey,fusr);
         exit(1);
     }
 
@@ -199,7 +209,8 @@ void Check(User *login){  //Checks if the user exists and if the users.txt file 
     if((fusr = fopen("users.txt", "r+")) == NULL){
         printf("users.txt does not exist.\nGenerating users.txt...\n");
         if((fusr = fopen("users.txt", "w+")) == NULL){
-            fprintf(stderr, "Fatal error!\nTerminating the program.");
+            fprintf(stderr, "Fatal error!\nTerminating the program. Press enter to continue.");
+            getchar();
             EOP(fkey, fusr);
             free(buf);
             free(pom);
@@ -233,6 +244,7 @@ void Check(User *login){  //Checks if the user exists and if the users.txt file 
         Create(login, buf, pom);
     free(buf);
     free(pom);
+    return;
 }
 
 void Create (User *login, unsigned char buf[(MAX*2)+2], unsigned char pom[(MAX*2)+2]){  //Account creation
@@ -252,11 +264,12 @@ void Create (User *login, unsigned char buf[(MAX*2)+2], unsigned char pom[(MAX*2
             printf("Please enter a valid choise (y/n): ");
             yn = getchar();
             getchar();
-        }while(yn != 'y' || yn != 'n');
+        }while(yn != 'y' && yn != 'n');
     }
 }
 
-void DefKey(User *login){  //Default key generation
+void DefKey(User *login, unsigned char DEFAULT_KEY[KEY_LEN+1]){  //Default key generation
+    memset(DEFAULT_KEY,0,(KEY_LEN+1)*sizeof(char));
     // char baf[30];
     //buf = malloc (5*sizeof(char));
     strncat(DEFAULT_KEY,login->username,4);
@@ -264,22 +277,21 @@ void DefKey(User *login){  //Default key generation
     strncat(DEFAULT_KEY,PADDING_KEY,16-strlen(DEFAULT_KEY));
 }
 
-void UsrKey(){  //User key generation
+void UsrKey(unsigned char USER_KEY[KEY_LEN+1]){  //User key generation
     Clear();
-    printf("Please enter your key (4 - 16 characters): ");
-    fgets(USER_KEY, KEY_LEN + 1, stdin);
-    USER_KEY[KEY_LEN] = '\0';
+    memset(USER_KEY, 0, (KEY_LEN+1)*sizeof(char));
+    do{
+        printf("Please enter your key (4 - 16 characters): ");
+        fgets(USER_KEY, KEY_LEN + 1, stdin);
+        USER_KEY[KEY_LEN] = '\0';
 
-    if(strchr(USER_KEY, '\n') != 0){ //Erases enter from the key
-        *strchr(USER_KEY, '\n') = 0;
-    }
-    if(strlen(USER_KEY)<4){
-        UsrKey();
-        return;
-    }
-    if(strlen(USER_KEY)<KEY_LEN){ //checks if the key is shorter than 16 and fills it in with the padding key
-        strncat(USER_KEY, PADDING_KEY, 16-strlen(USER_KEY));
-    }
+        if(strchr(USER_KEY, '\n') != 0){ //Erases enter from the key
+            *strchr(USER_KEY, '\n') = 0;
+        }
+        if(strlen(USER_KEY)<KEY_LEN){ //checks if the key is shorter than 16 and fills it in with the padding key
+            strncat(USER_KEY, PADDING_KEY, 16-strlen(USER_KEY));
+        }
+    }while(strlen(USER_KEY)<4);
 
     USER_KEY[KEY_LEN] = '\0';
 }
@@ -305,20 +317,20 @@ int Options(User *login){  //Main menu
 
 int FileChoice(){  //User chooses if they want to encrypt text or file
     int n;
-    printf("1.\tEncrypt text\n2.\tEncrypt file");
+    printf("1.\tEncrypt text\n2.\tEncrypt file\n3.\tReturn to main menu");
     printf("\nPlease type the number of the option: ");
     do{
         scanf("%d", &n);
         getchar();
-        if(n<1 || n>2){
-            printf("Incorrect option, try again!\n");
+        if(n<1 || n>3){
+            printf("Incorrect option, please try again!\n");
             printf("Please type the number of the option: ");
         }
-    }while(n<1 || n>2);
+    }while(n<1 || n>3);
     return n;
 }
 
-void DEncText(){  //Default key text encryption
+void DEncText(unsigned char DEFAULT_KEY[KEY_LEN+1]){  //Default key text encryption
     unsigned char *Text;
     FILE *EncText;
     if((EncText = fopen("EncText.txt", "w")) == NULL){ //Opening file EncText.txt
@@ -342,7 +354,8 @@ void DEncText(){  //Default key text encryption
     //int j = 0;
     unsigned char *TextEnc;
     if((TextEnc = malloc(strlen(Text)+1)) == NULL){
-        fprintf(stderr, "Could not allocate memory for TextEnc string! Terminating program.");
+        fprintf(stderr, "Could not allocate memory for TextEnc string! Terminating program.\nPress enter to continue");
+        getchar();
         free(Text);
         fclose(EncText);
         EOP(fkey, fusr);
@@ -380,9 +393,10 @@ void DEncText(){  //Default key text encryption
     free(Text);
     free(TextEnc);
     fclose(EncText);
+    return;
 }
 
-void UEncText(){  //User key text encryption
+void UEncText(unsigned char USER_KEY[KEY_LEN+1]){  //User key text encryption
     unsigned char *Text;
     FILE *EncText;
     if((EncText = fopen("EncText.txt", "w")) == NULL){ //Opening file EncText.txt
@@ -405,7 +419,8 @@ void UEncText(){  //User key text encryption
     //Encryption part!
     unsigned char *TextEnc;
     if((TextEnc = malloc(strlen(Text)+1)) == NULL){
-        fprintf(stderr, "Could not allocate memory for TextEnc string! Terminating program.");
+        fprintf(stderr, "Could not allocate memory for TextEnc string! Terminating program.\nPress enter to continue");
+        getchar();
         free(Text);
         fclose(EncText);
         EOP(fkey, fusr);
@@ -437,9 +452,10 @@ void UEncText(){  //User key text encryption
     free(Text);
     free(TextEnc);
     fclose(EncText);
+    return;
 }
 
-void DEncFile(){  //Default key file encryption
+void DEncFile(unsigned char DEFAULT_KEY[KEY_LEN+1]){  //Default key file encryption
     FILE *fraw, *fEnc;  //fraw is raw text, and fEnc is encrypted .txt file
     char *loc;  //Location of the file
     if(!(loc = malloc(151*sizeof(char)))){ //allocation of memory for file location
@@ -458,7 +474,6 @@ void DEncFile(){  //Default key file encryption
         if(fraw != NULL){
             break;
         }
-        fclose(fraw);
         fprintf(stderr, "Could not open destination %s.\nEnter new destination; \nor write menu to return to the main menu or exit to exit the program: ", loc);
         fgets(loc, 150, stdin);
         if(strchr(loc, '\n') != 0){ //Erases enter from the location
@@ -466,12 +481,10 @@ void DEncFile(){  //Default key file encryption
         }
         if(strcmp(loc,"menu") == 0){
             free(loc);
-            fclose(fraw);
             return;
         }
         else if (strcmp(loc,"exit") == 0){
             free(loc);
-            fclose(fraw);
             EOP(fkey, fusr);
             exit(0);
         }
@@ -486,11 +499,15 @@ void DEncFile(){  //Default key file encryption
     EncBuf = malloc(len * sizeof(char));
     RawBuf = malloc(len * sizeof(char));
     if(!EncBuf || !RawBuf){
-        fprintf(stderr, "Memory allocation for encrypted and decrypted text failed!");
+        fprintf(stderr, "Memory allocation for encrypted and decrypted text failed!\nPress enter to continue");
+        getchar();
         free(loc);
-        free(EncBuf);
-        free(RawBuf);
-        fclose(fraw);
+        if(EncBuf)
+            free(EncBuf);
+        if(RawBuf)
+            free(RawBuf);
+        if(fraw)
+            fclose(fraw);
         EOP(fkey,fusr);
         exit(1);
     }
@@ -527,9 +544,10 @@ void DEncFile(){  //Default key file encryption
     free(loc);
     fclose(fraw);
     fclose(fEnc);
+    return;
 }
 
-void UEncFile(){  //User key file encryption
+void UEncFile(unsigned char USER_KEY[KEY_LEN+1]){  //User key file encryption
     FILE *fraw, *fEnc;  //fraw is raw text, and fEnc is encrypted .txt file
     char *loc;  //Location of the file
     if(!(loc = malloc(151*sizeof(char)))){ //allocation of memory for file location
@@ -548,7 +566,6 @@ void UEncFile(){  //User key file encryption
         if(fraw != NULL){
             break;
         }
-        fclose(fraw);
         fprintf(stderr, "Could not open destination %s.\nEnter new destination; \nor write menu to return to the main menu or exit to exit the program: ", loc);
         fgets(loc, 150, stdin);
         if(strchr(loc, '\n') != 0){ //Erases enter from the location
@@ -556,12 +573,10 @@ void UEncFile(){  //User key file encryption
         }
         if(strcmp(loc,"menu") == 0){
             free(loc);
-            fclose(fraw);
             return;
         }
         else if (strcmp(loc,"exit") == 0){
             free(loc);
-            fclose(fraw);
             EOP(fkey, fusr);
             exit(0);
         }
@@ -576,11 +591,15 @@ void UEncFile(){  //User key file encryption
     EncBuf = malloc(len * sizeof(char));
     RawBuf = malloc(len * sizeof(char));
     if(!EncBuf || !RawBuf){
-        fprintf(stderr, "Memory allocation for encrypted and decrypted text failed!");
+        fprintf(stderr, "Memory allocation for encrypted and decrypted text failed!\nPress enter to continue.");
+        getchar();
         free(loc);
-        free(EncBuf);
-        free(RawBuf);
-        fclose(fraw);
+        if(EncBuf)
+            free(EncBuf);
+        if(RawBuf)
+            free(RawBuf);
+        if(fraw)
+            fclose(fraw);
         EOP(fkey,fusr);
         exit(1);
     }
@@ -617,24 +636,25 @@ void UEncFile(){  //User key file encryption
     free(loc);
     fclose(fraw);
     fclose(fEnc);
+    return;
 }
 
 int DChoice(){  //Option between default key decryption or user key decryption
     int n;
     printf("What key do you want to use to decrypt a file?");
-    printf("\n1.\tUsing default key.\n2.\tUsing user key.");
+    printf("\n1.\tUsing default key.\n2.\tUsing user key.\n3.\tReturn to main menu");
     printf("\nChoose an option: ");
     do{
         scanf("%d", &n);
         getchar();
-        if(n==1 || n==2){
+        if(n==1 || n==2 || n==3){
             break;
         }
-    }while(n<1 || n>2);
+    }while(n<1 || n>3);
     return n;
 }
 
-void DDec(){  //Default key decryption
+void DDec(unsigned char DEFAULT_KEY[KEY_LEN+1]){  //Default key decryption
     FILE *fDec, *fEnc; //fDec is for decrypted and fEnc is for encrypted
     char *loc; //file location
     if(!(loc = malloc(151*sizeof(char)))){
@@ -653,19 +673,16 @@ void DDec(){  //Default key decryption
         if(fEnc != NULL){
             break;
         }
-        fclose(fEnc);
         fprintf(stderr, "Could not open destination %s.\nEnter new destination;\nor write menu to return to the main menu or exit to exit the program:  ", loc);
         fgets(loc, 150, stdin);
         if(strchr(loc, '\n') != 0){ //Erases enter from the location
             *strchr(loc, '\n') = 0;
         }
         if(strcmp(loc, "menu") == 0){
-            fclose(fEnc);
             free(loc);
             return;
         }
         else if(strcmp(loc, "exit") == 0){
-            fclose(fEnc);
             free(loc);
             EOP(fkey, fusr);
             exit(0);
@@ -681,11 +698,15 @@ void DDec(){  //Default key decryption
     EncBuf = malloc(len * sizeof(char));
     DecBuf = malloc(len * sizeof(char));
     if(!EncBuf || !DecBuf){
-        fprintf(stderr, "Memory allocation for encrypted and decrypted text failed!");
+        fprintf(stderr, "Memory allocation for encrypted and decrypted text failed!\nPress enter to continue.");
+        getchar();
         free(loc);
-        free(EncBuf);
-        free(DecBuf);
-        fclose(fEnc);
+        if(EncBuf)
+            free(EncBuf);
+        if(DecBuf)
+            free(DecBuf);
+        if(fEnc)
+            fclose(fEnc);
         EOP(fkey,fusr);
         exit(1);
     }
@@ -700,10 +721,12 @@ void DDec(){  //Default key decryption
 
     fDec = fopen("DecryptedText.txt", "wb");
     if(!fDec){
-        fprintf(stderr, "Could not open DecryptedText.txt");
+        fprintf(stderr, "Could not open DecryptedText.txt\nPress enter to continue.");
+        getchar();
         free(EncBuf);
         free(DecBuf);
-        fclose(fEnc);
+        if(fEnc)
+            fclose(fEnc);
         EOP(fkey,fusr);
         exit(1);
     }
@@ -732,9 +755,10 @@ void DDec(){  //Default key decryption
     free(loc);
     free(EncBuf);
     free(DecBuf);
+    return;
 }
 
-void UDec(){  //User key decryption
+void UDec(unsigned char USER_KEY[KEY_LEN+1]){  //User key decryption
     FILE *fDec, *fEnc; //fDec is for decrypted and fEnc is for encrypted
     char *loc; //file location
     if(!(loc = malloc(151*sizeof(char)))){
@@ -753,19 +777,16 @@ void UDec(){  //User key decryption
         if(fEnc != NULL){
             break;
         }
-        fclose(fEnc);
         fprintf(stderr, "Could not open destination %s.\nEnter new destination;\nor write menu to return to the main menu or exit to exit the program:  ", loc);
         fgets(loc, 150, stdin);
         if(strchr(loc, '\n') != 0){ //Erases enter from the location
             *strchr(loc, '\n') = 0;
         }
         if(strcmp(loc, "menu") == 0){
-            fclose(fEnc);
             free(loc);
             return;
         }
         else if(strcmp(loc, "exit") == 0){
-            fclose(fEnc);
             free(loc);
             EOP(fkey, fusr);
             exit(0);
@@ -781,11 +802,15 @@ void UDec(){  //User key decryption
     EncBuf = malloc(len * sizeof(char));
     DecBuf = malloc(len * sizeof(char));
     if(!EncBuf || !DecBuf){
-        fprintf(stderr, "Memory allocation for encrypted and decrypted text failed!");
+        fprintf(stderr, "Memory allocation for encrypted and decrypted text failed!\nPress enter to continue.");
+        getchar();
         free(loc);
-        free(EncBuf);
-        free(DecBuf);
-        fclose(fEnc);
+        if(EncBuf)
+            free(EncBuf);
+        if(DecBuf)
+            free(DecBuf);
+        if(fEnc)
+            fclose(fEnc);
         EOP(fkey,fusr);
         exit(1);
     }
@@ -800,10 +825,12 @@ void UDec(){  //User key decryption
 
     fDec = fopen("DecryptedText.txt", "wb");
     if(!fDec){
-        fprintf(stderr, "Could not open DecryptedText.txt");
+        fprintf(stderr, "Could not open DecryptedText.txt\nPress enter to continue.");
+        getchar();
         free(EncBuf);
         free(DecBuf);
-        fclose(fEnc);
+        if(fEnc)
+            fclose(fEnc);
         EOP(fkey,fusr);
         exit(1);
     }
@@ -831,4 +858,5 @@ void UDec(){  //User key decryption
     free(loc);
     free(EncBuf);
     free(DecBuf);
+    return;
 }

@@ -2,6 +2,8 @@
 Program/*.txt
 Program/*.bin
 Program/*.key
+Program/copy.c
+Program/Exe
 
 # Test
 Test/
