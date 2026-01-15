@@ -1,3 +1,6 @@
+#Source folder
+users.txt
+
 #Program
 Program/*.txt
 Program/*.bin
