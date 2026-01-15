@@ -92,3 +92,9 @@ Update 07.01.2026.
 The program is done!
 I am aware that the functions could've been actually changed a lot and I have a random fkey floating in my program
 but in the following days I will be working on actual optimization and removing redundant code :3
+
+----------------------------------------------------------------------------
+
+Update 15.01.2026.
+
+Major optimiziations to the code.
