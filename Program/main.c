@@ -547,10 +547,11 @@ void Dec(unsigned char KEY[KEY_LEN+1]){  //Default key decryption
         EOP(fEnc, fDec, EncBuf, DecBuf); free(loc);
         return;
     }
+    EOP(fEnc, fDec, EncBuf, DecBuf); free(loc);
+
     printf("Decrypted file is saved at:\n%s\\DecryptedText.txt\n", cwd);
     printf("\nPress enter to return to main menu.");
     getchar();
 
-    EOP(fEnc, fDec, EncBuf, DecBuf); free(loc);
     return;
 }
